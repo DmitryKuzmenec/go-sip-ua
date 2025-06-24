@@ -130,8 +130,8 @@ func (ua *UserAgent) buildRequest(
 	return &req, nil
 }
 
-func (ua *UserAgent) SendRegister(profile *account.Profile, recipient sip.SipUri, expires uint32, userdata interface{}) (*Register, error) {
-	register := NewRegister(ua, profile, recipient, userdata)
+func (ua *UserAgent) SendRegister(ctx context.Context, profile *account.Profile, recipient sip.SipUri, expires uint32, userdata interface{}) (*Register, error) {
+	register := NewRegister(ctx, ua, profile, recipient, userdata)
 	err := register.SendRegister(expires)
 	if err != nil {
 		ua.Log().Errorf("SendRegister failed, err => %v", err)

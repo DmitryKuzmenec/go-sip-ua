@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"os"
 	"os/signal"
@@ -112,7 +113,7 @@ func main() {
 		logger.Error(err)
 	}
 
-	register, _ := ua.SendRegister(profile, recipient, profile.Expires, nil)
+	register, _ := ua.SendRegister(context.Background(), profile, recipient, profile.Expires, nil)
 	time.Sleep(time.Second * 3)
 
 	udp = createUdp()
@@ -129,7 +130,7 @@ func main() {
 		logger.Error(err)
 	}
 
-	go ua.Invite(profile, called, recipient, &sdp)
+	go ua.Invite(context.Background(), profile, called, recipient, &sdp, []sip.Header{})
 
 	<-stop
 

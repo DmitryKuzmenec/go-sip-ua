@@ -1,6 +1,7 @@
 package b2bua
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/cloudwebrtc/go-sip-ua/examples/b2bua/fcm"
@@ -61,7 +62,7 @@ func init() {
 	logger = utils.NewLogrusLogger(log.InfoLevel, "B2BUA", nil)
 }
 
-//NewB2BUA .
+// NewB2BUA .
 func NewB2BUA(disableAuth bool, enableTLS bool) *B2BUA {
 	b := &B2BUA{
 		registry: registry.Registry(registry.NewMemoryRegistry()),
@@ -139,7 +140,7 @@ func NewB2BUA(disableAuth bool, enableTLS bool) *B2BUA {
 				}
 
 				offer := sess.RemoteSdp()
-				dest, err := ua.Invite(profile, called, recipient, &offer)
+				dest, err := ua.Invite(context.Background(), profile, called, recipient, &offer, []sip.Header{})
 				if err != nil {
 					logger.Errorf("B-Leg session error: %v", err)
 					return
@@ -257,7 +258,7 @@ func (b *B2BUA) removeCall(sess *session.Session) {
 	}
 }
 
-//Shutdown .
+// Shutdown .
 func (b *B2BUA) Shutdown() {
 	b.ua.Shutdown()
 }
@@ -287,22 +288,22 @@ func (b *B2BUA) requiresChallenge(req sip.Request) bool {
 	return false
 }
 
-//AddAccount .
+// AddAccount .
 func (b *B2BUA) AddAccount(username string, password string) {
 	b.accounts[username] = password
 }
 
-//GetAccounts .
+// GetAccounts .
 func (b *B2BUA) GetAccounts() map[string]string {
 	return b.accounts
 }
 
-//GetRegistry .
+// GetRegistry .
 func (b *B2BUA) GetRegistry() registry.Registry {
 	return b.registry
 }
 
-//GetRFC8599 .
+// GetRFC8599 .
 func (b *B2BUA) GetRFC8599() *registry.RFC8599 {
 	return b.rfc8599
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/signal"
 	"syscall"
@@ -65,7 +66,7 @@ func main() {
 		logger.Error(err)
 	}
 
-	register, err := ua.SendRegister(profile, recipient, profile.Expires, nil)
+	register, err := ua.SendRegister(context.Background(), profile, recipient, profile.Expires, nil)
 	if err != nil {
 		logger.Error(err)
 	}

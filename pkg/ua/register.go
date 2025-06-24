@@ -23,7 +23,7 @@ type Register struct {
 	data       interface{}
 }
 
-func NewRegister(ua *UserAgent, profile *account.Profile, recipient sip.SipUri, data interface{}) *Register {
+func NewRegister(ctx context.Context, ua *UserAgent, profile *account.Profile, recipient sip.SipUri, data interface{}) *Register {
 	r := &Register{
 		ua:        ua,
 		profile:   profile,
