@@ -9,7 +9,6 @@ import (
 	"github.com/cloudwebrtc/go-sip-ua/pkg/auth"
 	"github.com/cloudwebrtc/go-sip-ua/pkg/session"
 	"github.com/cloudwebrtc/go-sip-ua/pkg/stack"
-	"github.com/davecgh/go-spew/spew"
 
 	"github.com/ghettovoice/gosip/log"
 	"github.com/ghettovoice/gosip/sip"
@@ -375,7 +374,6 @@ func (ua *UserAgent) RequestWithContext(ctx context.Context, request sip.Request
 		for {
 			select {
 			case <-ctx.Done():
-				spew.Dump("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 				if lastResponse != nil && lastResponse.IsProvisional() {
 					s.CancelRequest(request, lastResponse)
 				}
