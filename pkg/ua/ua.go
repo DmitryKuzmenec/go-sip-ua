@@ -3,13 +3,13 @@ package ua
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 
 	"github.com/cloudwebrtc/go-sip-ua/pkg/account"
 	"github.com/cloudwebrtc/go-sip-ua/pkg/auth"
 	"github.com/cloudwebrtc/go-sip-ua/pkg/session"
 	"github.com/cloudwebrtc/go-sip-ua/pkg/stack"
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/ghettovoice/gosip/log"
 	"github.com/ghettovoice/gosip/sip"
@@ -38,13 +38,13 @@ type UserAgentConfig struct {
 	SipStack *stack.SipStack
 }
 
-//InviteSessionHandler .
+// InviteSessionHandler .
 type InviteSessionHandler func(s *session.Session, req *sip.Request, resp *sip.Response, status session.Status)
 
-//RegisterHandler .
+// RegisterHandler .
 type RegisterHandler func(regState account.RegisterState)
 
-//UserAgent .
+// UserAgent .
 type UserAgent struct {
 	InviteStateHandler   InviteSessionHandler
 	RegisterStateHandler RegisterHandler
@@ -53,7 +53,7 @@ type UserAgent struct {
 	log                  log.Logger
 }
 
-//NewUserAgent .
+// NewUserAgent .
 func NewUserAgent(config *UserAgentConfig) *UserAgent {
 	ua := &UserAgent{
 		config:               config,
@@ -140,11 +140,11 @@ func (ua *UserAgent) SendRegister(profile *account.Profile, recipient sip.SipUri
 	return register, nil
 }
 
-func (ua *UserAgent) Invite(profile *account.Profile, target sip.Uri, recipient sip.SipUri, body *string) (*session.Session, error) {
-	return ua.InviteWithContext(context.TODO(), profile, target, recipient, body)
+func (ua *UserAgent) Invite(ctx context.Context, profile *account.Profile, target sip.Uri, recipient sip.SipUri, body *string, headers []sip.Header) (*session.Session, error) {
+	return ua.InviteWithContext(ctx, profile, target, recipient, body, headers)
 }
 
-func (ua *UserAgent) InviteWithContext(ctx context.Context, profile *account.Profile, target sip.Uri, recipient sip.SipUri, body *string) (*session.Session, error) {
+func (ua *UserAgent) InviteWithContext(ctx context.Context, profile *account.Profile, target sip.Uri, recipient sip.SipUri, body *string, headers []sip.Header) (*session.Session, error) {
 
 	from := &sip.Address{
 		DisplayName: sip.String{Str: profile.DisplayName},
@@ -162,6 +162,12 @@ func (ua *UserAgent) InviteWithContext(ctx context.Context, profile *account.Pro
 	if err != nil {
 		ua.Log().Errorf("INVITE: err = %v", err)
 		return nil, err
+	}
+
+	if len(headers) > 0 {
+		for _, h := range headers {
+			(*request).AppendHeader(h)
+		}
 	}
 
 	if body != nil {
@@ -369,6 +375,7 @@ func (ua *UserAgent) RequestWithContext(ctx context.Context, request sip.Request
 		for {
 			select {
 			case <-ctx.Done():
+				spew.Dump("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 				if lastResponse != nil && lastResponse.IsProvisional() {
 					s.CancelRequest(request, lastResponse)
 				}
@@ -460,10 +467,8 @@ func (ua *UserAgent) RequestWithContext(ctx context.Context, request sip.Request
 					return
 				}
 
-				// failed request
-				if lastResponse != nil {
-					lastResponse.SetPrevious(previousResponses)
-				}
+				lastResponse.SetPrevious(previousResponses)
+
 				errs <- sip.NewRequestError(uint(response.StatusCode()), response.Reason(), request, lastResponse)
 				return
 			}
