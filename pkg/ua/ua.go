@@ -28,7 +28,7 @@ type SessionKey struct {
 func NewSessionKey(callID sip.CallID, tagID sip.MaybeString) SessionKey {
 	return SessionKey{
 		CallID: callID,
-		TagID:  tagID,
+		//TagID:  tagID,
 	}
 }
 
