@@ -1,6 +1,6 @@
 module github.com/cloudwebrtc/go-sip-ua
 
-go 1.22.2
+go 1.24.2
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
